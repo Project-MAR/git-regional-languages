@@ -25,8 +25,8 @@ object Core extends App {
   val dists_ = dists.filter("SIZE(coords)>0")
 
   // Analyse the distribution with histogram-based method
-  println(Console.MAGENTA + "******* HISTOGRAM ANALYSIS ********" + Console.RESET)
-  HistogramAnalysis.analyse(sc, sqlctx, dists_, verbose)
+  // println(Console.MAGENTA + "******* HISTOGRAM ANALYSIS ********" + Console.RESET)
+  // HistogramAnalysis.analyse(sc, sqlctx, dists_, verbose)
 
   // Analyse the distribution with 2D data
   println(Console.MAGENTA + "******* 2D ANALYSIS ********" + Console.RESET)
@@ -39,6 +39,12 @@ object TwoDimAnalysis {
 
     // Accumulate the entire universe of all geospatial spots
     val universe = Transform.aggregate2dSpatial(sqlctx, dists)
+
+    // TAODEBUG: Visualise the universal distributions
+    universe.foreach { row =>
+      println("######################")
+      println(row)
+    }
   }
 }
 

@@ -10,6 +10,67 @@ import org.apache.spark.mllib.linalg.{ Vectors, Matrices }
 object Transform {
 
   /**
+   * Create RDDs of histograms from the raw distribution data
+   */
+  def toHistograms(sc: SparkContext, sqlctx: SQLContext, dists: DataFrame): List[Array[Double]] = {
+    import sqlctx.implicits._
+    val contrib = dists.select($"coords").collect()
+
+    // Create an array of the 2D distributions
+    val spots = contrib.map { (dataArray) =>
+      val elements = dataArray.getAs[WrappedArray[WrappedArray[Any]]](0)
+
+      // Iterate through each element of the distributions of language
+      val initialSpots = List.empty[SpatialCodeSpot]
+      elements.foldLeft(initialSpots) { (list, components) =>
+        val lat = components.apply(0) match {
+          case s: String => s.toDouble
+        }
+        val lng = components.apply(1) match {
+          case s: String => s.toDouble
+        }
+        val dense = components.apply(2) match {
+          case s: String => try {
+            s.toInt
+          } catch {
+            case e: Exception => 0
+          }
+        }
+
+        val location = SpatialLocation(lat, lng)
+        val spot = SpatialCodeSpot(location, dense)
+        spot :: list
+      }
+    }
+
+    // Convert 2D distribution data into histograms
+    val binSize = 20; // Degrees
+    val initialList = List.empty[Array[Double]]
+    val histograms = spots.foldLeft(initialList) { (hists, spotArray) =>
+      var (lat, lng) = (0, 0)
+      var binVector = Array.empty[Double]
+      for (lat <- -90 until 90 by binSize) {
+        for (lng <- -180 until 180 by binSize) {
+          // Accumulate the density of contributions
+          // inside the 2d bin cell
+          val density = spotArray
+            .filter(n =>
+              n.pos.lat >= lat && n.pos.lat < lat + binSize &&
+                n.pos.lng >= lng && n.pos.lng < lng + binSize)
+            .foldLeft(0D) { (total, n) => total + n.density }
+
+          // Accumulate the bin vector
+          binVector = binVector :+ density
+        }
+      }
+      val hists_ = binVector :: hists
+      hists
+    }
+
+    histograms
+  }
+
+  /**
    * Aggregate the entire universal distributions
    * into one single dataframe
    */
