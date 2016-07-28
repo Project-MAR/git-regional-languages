@@ -43,9 +43,6 @@ object Transform {
       }
     }
 
-    // TAODEBUG:
-    println(Console.CYAN + s"Spots := ${spots.size}" + Console.RESET)
-
     // Convert 2D distribution data into histograms
     val binSize = 20; // Degrees
     val initialArray = Array.empty[Array[Double]]
@@ -69,6 +66,16 @@ object Transform {
     }
 
     histograms
+  }
+
+  /**
+   * Normalise each of the bin vectors
+   */
+  def toRatioBins(dataArray :Array[Array[Double]]): Array[Array[Double]] = {
+    dataArray.map { (array) =>
+      val sum = array.foldLeft(0D){(tot,b) => tot+b }
+      array.map{(a) => a/sum} if (sum>0) else array
+    }
   }
 
   /**

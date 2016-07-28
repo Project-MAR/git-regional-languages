@@ -43,10 +43,13 @@ object TwoDimAnalysis {
     if (verbose) {
       println(Console.CYAN + "***************** HISTOGRAMS ************" + Console.RESET)
       histograms foreach { (hist) =>
-        println(hist)
+        println(hist.mkString(","))
         println("-------------------------------")
       }
     }
+
+    // Normalise the bin histograms, so each bin represents ratio
+    // TAOTODO:
   }
 }
 
