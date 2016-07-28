@@ -24,7 +24,20 @@ object Core extends App {
   // Filter only those languages with distributions
   val dists_ = dists.filter("SIZE(coords)>0")
 
+  // Analyse the distribution with histogram-based method
+  println(Console.MAGENTA + "******* HISTOGRAM ANALYSIS ********" + Console.RESET)
   HistogramAnalysis.analyse(sc, sqlctx, dists_, verbose)
+
+  // Analyse the distribution with 2D data
+  println(Console.MAGENTA + "******* 2D ANALYSIS ********" + Console.RESET)
+  TwoDimAnalysis.analyse(sc, sqlctx, dists_, verbose)
+}
+
+object TwoDimAnalysis {
+  def analyse(sc: SparkContext, sqlctx: SQLContext, dists: DataFrame, verbose: Boolean) {
+    // TAOTODO:
+
+  }
 }
 
 object HistogramAnalysis {
@@ -43,9 +56,6 @@ object HistogramAnalysis {
     // Group geospatial distributions data of each language
     // into [bin] so we have fixed-length numerical vectors.
     val binVectors = Transform.geoDistToBins(sqlctx, dists, universe)
-
-    // Visualise the resultant bin vectors
-    //// Plot.plotBinVectors(binVectors)
 
     // Classify the bin vectors into K different patterns
     val K = 6
