@@ -13,7 +13,7 @@ object Transform {
    * Aggregate the entire universal distributions
    * into one single dataframe
    */
-  def aggregate2dSpatial(sqlctx: SQLContext, dists: DataFrame) {
+  def aggregate2dSpatial(sqlctx: SQLContext, dists: DataFrame): Array[List[gitlang.SpatialCodeSpot]] = {
     import sqlctx.implicits._
     val contrib = dists.select($"coords").collect()
 
@@ -43,7 +43,7 @@ object Transform {
       }
     }
 
-    // TAOTODO:
+    structuredSpots
   }
 
   /**
