@@ -35,15 +35,17 @@ object Core extends App {
 
 object TwoDimAnalysis {
   def analyse(sc: SparkContext, sqlctx: SQLContext, dists: DataFrame, verbose: Boolean) {
-    // TAOTODO:
 
-    // Accumulate the entire universe of all geospatial spots
-    val universe = Transform.aggregate2dSpatial(sqlctx, dists)
+    // Create bin histograms
+    val histograms = Transform.toHistograms(sc, sqlctx, dists)
 
-    // TAODEBUG: Visualise the universal distributions
-    universe.foreach { row =>
-      println("######################")
-      println(row)
+    // Illustrate histograms
+    if (verbose) {
+      println(Console.CYAN + "***************** HISTOGRAMS ************" + Console.RESET)
+      histograms foreach { (hist) =>
+        println(hist)
+        println("-------------------------------")
+      }
     }
   }
 }

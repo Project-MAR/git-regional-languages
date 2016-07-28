@@ -12,7 +12,7 @@ object Transform {
   /**
    * Create RDDs of histograms from the raw distribution data
    */
-  def toHistograms(sc: SparkContext, sqlctx: SQLContext, dists: DataFrame): List[Array[Double]] = {
+  def toHistograms(sc: SparkContext, sqlctx: SQLContext, dists: DataFrame): Array[Array[Double]] = {
     import sqlctx.implicits._
     val contrib = dists.select($"coords").collect()
 
@@ -43,10 +43,13 @@ object Transform {
       }
     }
 
+    // TAODEBUG:
+    println(Console.CYAN + s"Spots := ${spots.size}" + Console.RESET)
+
     // Convert 2D distribution data into histograms
     val binSize = 20; // Degrees
-    val initialList = List.empty[Array[Double]]
-    val histograms = spots.foldLeft(initialList) { (hists, spotArray) =>
+    val initialArray = Array.empty[Array[Double]]
+    val histograms = spots.foldLeft(initialArray) { (hists, spotArray) =>
       var (lat, lng) = (0, 0)
       var binVector = Array.empty[Double]
       for (lat <- -90 until 90 by binSize) {
@@ -54,17 +57,15 @@ object Transform {
           // Accumulate the density of contributions
           // inside the 2d bin cell
           val density = spotArray
-            .filter(n =>
-              n.pos.lat >= lat && n.pos.lat < lat + binSize &&
-                n.pos.lng >= lng && n.pos.lng < lng + binSize)
+            .filter(n => n.pos.lat >= lat && n.pos.lat < lat + binSize &&
+              n.pos.lng >= lng && n.pos.lng < lng + binSize)
             .foldLeft(0D) { (total, n) => total + n.density }
 
           // Accumulate the bin vector
           binVector = binVector :+ density
         }
       }
-      val hists_ = binVector :: hists
-      hists
+      hists :+ binVector
     }
 
     histograms
