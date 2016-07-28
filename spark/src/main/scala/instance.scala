@@ -37,6 +37,8 @@ object TwoDimAnalysis {
   def analyse(sc: SparkContext, sqlctx: SQLContext, dists: DataFrame, verbose: Boolean) {
     // TAOTODO:
 
+    // Accumulate the entire universe of all geospatial spots
+    val universe = Transform.aggregate2dSpatial(sqlctx, dists)
   }
 }
 

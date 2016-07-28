@@ -8,6 +8,44 @@ import org.apache.spark.mllib.linalg.{ Vectors, Matrices }
 // Data munging auxiliary functions
 
 object Transform {
+
+  /**
+   * Aggregate the entire universal distributions
+   * into one single dataframe
+   */
+  def aggregate2dSpatial(sqlctx: SQLContext, dists: DataFrame) {
+    import sqlctx.implicits._
+    val contrib = dists.select($"coords").collect()
+
+    val structuredSpots = contrib.map { (dataArray) =>
+      val elements = dataArray.getAs[WrappedArray[WrappedArray[Any]]](0)
+
+      // Iterate through each element of the distributions of language
+      elements.foldLeft(List[SpatialCodeSpot]()) { (list, components) =>
+        val lat = components.apply(0) match {
+          case s: String => s.toDouble
+        }
+        val lng = components.apply(1) match {
+          case s: String => s.toDouble
+        }
+        val dense = components.apply(2) match {
+          case s: String => try {
+            s.toInt
+          } catch {
+            case e: Exception => 0
+          }
+        }
+
+        val location = SpatialLocation(lat, lng)
+        val spot = SpatialCodeSpot(location, dense)
+        val list_ = spot :: list
+        list_
+      }
+    }
+
+    // TAOTODO:
+  }
+
   /**
    * Accumulate the entire distribution map of the code contribution
    * by all languages in the current data frame and create a mapping
