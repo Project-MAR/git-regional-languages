@@ -5,7 +5,6 @@ import org.apache.spark.sql.{ SQLContext, DataFrame, Row }
 import scala.collection.mutable.{ Map, WrappedArray }
 import org.apache.spark.mllib.linalg.{ Vectors, Matrices }
 
-
 // Data munging auxiliary functions
 
 object Transform {
