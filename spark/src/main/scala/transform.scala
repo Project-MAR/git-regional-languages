@@ -71,10 +71,10 @@ object Transform {
   /**
    * Normalise each of the bin vectors
    */
-  def toRatioBins(dataArray :Array[Array[Double]]): Array[Array[Double]] = {
+  def toRatioBins(dataArray: Array[Array[Double]]): Array[Array[Double]] = {
     dataArray.map { (array) =>
-      val sum = array.foldLeft(0D){(tot,b) => tot+b }
-      array.map{(a) => a/sum} if (sum>0) else array
+      val sum = array.foldLeft(0D) { (tot, b) => tot + b }
+      if (sum > 0) array.map { (a) => a / sum } else array
     }
   }
 
