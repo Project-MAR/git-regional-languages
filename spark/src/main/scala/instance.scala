@@ -8,6 +8,7 @@ import org.apache.spark.{ SparkContext, SparkConf }
 import org.apache.spark.sql.{ SQLContext, DataFrame }
 import java.io.{ Console => _, _ }
 import org.sameersingh.scalaplot.Implicits._
+import org.sameersingh.scalaplot._
 
 object Core extends App {
 
@@ -51,10 +52,10 @@ object TwoDimAnalysis {
         println("-------------------------------")
       }
 
-      // Plot the histograms
-      val toY = (in: Array[Double]) => Y(in, "bin")
+      // Plot the fractional-ratio histograms
+      val toY = (in: Array[Double]) => Y(in, style = XYPlotStyle.Lines)
       val x = (1 until ratioHistograms(0).size).map(_.toDouble)
-      val ys = ratioHistograms.map(toY)
+      val ys = ratioHistograms.map(toY).toSeq
       output(GUI, xyChart(x -> ys))
     }
   }
