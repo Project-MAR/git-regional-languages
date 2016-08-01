@@ -54,8 +54,9 @@ object TwoDimAnalysis {
 
       // Plot the fractional-ratio histograms
       val toY = (in: Array[Double]) => Y(in, style = XYPlotStyle.Lines)
-      val x = (1 until ratioHistograms(0).size).map(_.toDouble)
+      val x = (0 until ratioHistograms(0).size).map(_.toDouble)
       val ys = ratioHistograms.map(toY).toSeq
+
       output(GUI, xyChart(x -> ys))
     }
   }
