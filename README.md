@@ -1,5 +1,7 @@
 # Git Regional Languages
 
+http://starcolon.com/blog/geospatial-distribution-of-programming-languages/index.html
+
 > Have you ever wonder how the geospatial distribution of the programming 
 languages would look like? I do so I made this.
 
