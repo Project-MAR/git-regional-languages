@@ -7,6 +7,7 @@ import scala.io.StdIn.{ readLine, readInt }
 import org.apache.spark.{ SparkContext, SparkConf }
 import org.apache.spark.sql.{ SQLContext, DataFrame }
 import java.io.{ Console => _, _ }
+import org.sameersingh.scalaplot.Implicits._
 
 object Core extends App {
 
@@ -39,17 +40,23 @@ object TwoDimAnalysis {
     // Create bin histograms
     val histograms = Transform.toHistograms(sc, sqlctx, dists)
 
+    // Normalise bin histograms
+    val ratioHistograms = Transform.toRatioBins(histograms)
+
     // Illustrate histograms
     if (verbose) {
       println(Console.CYAN + "***************** HISTOGRAMS ************" + Console.RESET)
-      histograms foreach { (hist) =>
+      ratioHistograms foreach { (hist) =>
         println(hist.mkString(","))
         println("-------------------------------")
       }
-    }
 
-    // Normalise the bin histograms, so each bin represents ratio
-    // TAOTODO:
+      // Plot the histograms
+      val toY = (in: Array[Double]) => Y(in, "bin")
+      val x = (1 until ratioHistograms(0).size).map(_.toDouble)
+      val ys = ratioHistograms.map(toY)
+      output(GUI, xyChart(x -> ys))
+    }
   }
 }
 

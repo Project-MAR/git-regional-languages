@@ -15,7 +15,8 @@ libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-mllib" % "1.6.0",
   "org.scalanlp" %% "breeze" % "0.12",
   "org.scalanlp" %% "breeze-natives" % "0.12",
-  "org.scalanlp" %% "breeze-viz" % "0.12"
+  "org.scalanlp" %% "breeze-viz" % "0.12",
+  "org.sameersingh.scalaplot" % "scalaplot" % "0.0.4"
 )
 
 /**
