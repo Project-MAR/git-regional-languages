@@ -47,12 +47,13 @@ object TwoDimAnalysis {
     if (verbose) {
       println(Console.CYAN + "***************** HISTOGRAMS ************" + Console.RESET)
       ratioHistograms foreach { (hist) =>
-        println(hist.mkString(","))
+        println(s"[${hist.lang}]")
+        println(hist.binVector.mkString(","))
         println("-------------------------------")
       }
 
       // Plot the fractional-ratio histograms
-      val toY = (in: Array[Double]) => Y(in, style = XYPlotStyle.Lines)
+      val toY = (in: LanguageHistogram) => Y(in.binVector, style = XYPlotStyle.Lines)
       val x = (0 until ratioHistograms(0).size).map(_.toDouble)
       val ys = ratioHistograms.map(toY).toSeq
 

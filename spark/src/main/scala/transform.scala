@@ -78,10 +78,14 @@ object Transform {
   /**
    * Normalise each of the bin vectors
    */
-  def toRatioBins(dataArray: Array[Array[Double]]): Array[Array[Double]] = {
-    dataArray.map { (array) =>
-      val sum = array.foldLeft(0D) { (tot, b) => tot + b }
-      if (sum > 0) array.map { (a) => a / sum } else array
+  def toRatioBins(dataArray: Array[LanguageHistogram]): Array[LanguageHistogram] = {
+    dataArray.map {
+      case LanguageHistogram(lang, array) =>
+        val sum = array.foldLeft(0D) { (tot, b) => tot + b }
+        if (sum > 0)
+          LanguageHistogram(lang, array.map { (a) => a / sum })
+        else
+          LanguageHistogram(lang, array)
     }
   }
 
