@@ -7,6 +7,9 @@ import org.apache.spark.mllib.clustering.{ KMeans, KMeansModel }
 import org.apache.spark.mllib.clustering.{ GaussianMixture, GaussianMixtureModel }
 import org.apache.spark.mllib.linalg.{ Vectors, Matrices }
 
+/**
+ * TAOTODO: Deprecated
+ */
 object Analysis {
 
   /**
