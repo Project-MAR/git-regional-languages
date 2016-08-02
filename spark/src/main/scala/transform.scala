@@ -91,28 +91,6 @@ object Transform {
 
   def toReducedBins(dataArray: Array[LanguageHistogram], decayRatio: Double): Array[LanguageHistogram] = {
 
-    val sumE = (array: Array[Double]) => {
-      val sumSqrEnergy = array.foldLeft(0D) { (tot, v) => tot + Math.pow(v, 2) }
-      Math.sqrt(sumSqrEnergy)
-    }
-
-    val buildVector = (maxEnergy: Double, sorted: Array[(Double, Int)], result: Array[Double]) => {
-      if (sorted.size == 0)
-        return result
-
-      val (n, i) = sorted.head
-      val ns = sorted.tail
-      val result_ = result.updated(i, n)
-
-      // If the built vector exceeds the max energy,
-      // returns the original version
-      if (sumE(result_) >= maxEnergy)
-        return result
-      else
-        // Otherwise, proceed 
-        return buildVector(maxEnergy, ns, result_)
-    }
-
     dataArray.map {
       case LanguageHistogram(lang, array) =>
         val threshEnergy = decayRatio * sumE(array)
@@ -126,9 +104,35 @@ object Transform {
         // until it builds a resultant array
         // which composes energy up to desired fraction of original one.
         val binLength = array.size
-        val reducedBinVec = buildVector(threshEnergy, array_, Array.fill(binLength)(0D))
+        val reducedBinVec = aggregateEnergyBoundedVector(
+          threshEnergy,
+          array_,
+          Array.fill(binLength)(0D)
+        )
         LanguageHistogram(lang, reducedBinVec)
     }
+  }
+
+  private def sumE(array: Array[Double]): Double = {
+    val sumSqrEnergy = array.foldLeft(0D) { (tot, v) => tot + Math.pow(v, 2) }
+    Math.sqrt(sumSqrEnergy)
+  }
+
+  private def aggregateEnergyBoundedVector(maxEnergy: Double, sorted: Array[(Double, Int)], result: Array[Double]): Array[Double] = {
+    if (sorted.size == 0)
+      return result
+
+    val (n, i) = sorted.head
+    val ns = sorted.tail
+    val result_ = result.updated(i, n)
+
+    // If the built vector exceeds the max energy,
+    // returns the original version
+    if (sumE(result_) >= maxEnergy)
+      return result
+    else
+      // Otherwise, proceed 
+      return aggregateEnergyBoundedVector(maxEnergy, ns, result_)
   }
 
   /**
