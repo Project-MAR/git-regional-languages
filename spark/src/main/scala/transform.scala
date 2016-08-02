@@ -12,7 +12,7 @@ object Transform {
   /**
    * Create RDDs of histograms from the raw distribution data
    */
-  def toHistograms(sc: SparkContext, sqlctx: SQLContext, dists: DataFrame, binLatSize: Int, binLngSize: Int): Array[Array[Double]] = {
+  def toHistograms(sc: SparkContext, sqlctx: SQLContext, dists: DataFrame, binLatSize: Int, binLngSize: Int): Array[LanguageHistogram] = {
     import sqlctx.implicits._
     //val contrib = dists.select($"coords").collect()
     val contrib = dists.collect()
@@ -22,11 +22,10 @@ object Transform {
 
       val lang = dataArray.getAs[String](0)
       val elements = dataArray.getAs[WrappedArray[WrappedArray[Any]]](1)
-      // val elements = dataArray.getAs[WrappedArray[WrappedArray[Any]]](0)
 
       // Iterate through each element of the distributions of language
       val initialSpots = List.empty[SpatialCodeSpot]
-      elements.foldLeft(initialSpots) { (list, components) =>
+      val binVector = elements.foldLeft(initialSpots) { (list, components) =>
         val lat = components.apply(0) match {
           case s: String => s.toDouble
         }
@@ -45,18 +44,23 @@ object Transform {
         val spot = SpatialCodeSpot(location, dense)
         spot :: list
       }
+
+      (lang, binVector)
     }
 
     // Convert 2D distribution data into histograms
-    val initialArray = Array.empty[Array[Double]]
+    val initialArray = Array.empty[LanguageHistogram]
     val histograms = spots.foldLeft(initialArray) { (hists, spotArray) =>
+
+      val (lang, vector) = spotArray
+
       var (lat, lng) = (0, 0)
       var binVector = Array.empty[Double]
       for (lat <- -90 until 90 by binLatSize) {
         for (lng <- -180 until 180 by binLngSize) {
           // Accumulate the density of contributions
           // inside the 2d bin cell
-          val density = spotArray
+          val density = vector
             .filter(n => n.pos.lat >= lat && n.pos.lat < lat + binLatSize &&
               n.pos.lng >= lng && n.pos.lng < lng + binLngSize)
             .foldLeft(0D) { (total, n) => total + n.density }
@@ -65,7 +69,7 @@ object Transform {
           binVector = binVector :+ density
         }
       }
-      hists :+ binVector
+      hists :+ LanguageHistogram(lang, binVector)
     }
 
     histograms
