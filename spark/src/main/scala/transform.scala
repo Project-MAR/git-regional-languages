@@ -14,16 +14,15 @@ object Transform {
    */
   def toHistograms(sc: SparkContext, sqlctx: SQLContext, dists: DataFrame, binLatSize: Int, binLngSize: Int): Array[Array[Double]] = {
     import sqlctx.implicits._
-    val contrib = dists.select($"coords").collect()
+    //val contrib = dists.select($"coords").collect()
+    val contrib = dists.collect()
 
     // Create an array of the 2D distributions
     val spots = contrib.map { (dataArray) =>
 
-      // TAODEBUG:
-      println(Console.MAGENTA + ">>>>>>>>>>" + Console.RESET)
-      println(dataArray)
-
-      val elements = dataArray.getAs[WrappedArray[WrappedArray[Any]]](0)
+      val lang = dataArray.getAs[String](0)
+      val elements = dataArray.getAs[WrappedArray[WrappedArray[Any]]](1)
+      // val elements = dataArray.getAs[WrappedArray[WrappedArray[Any]]](0)
 
       // Iterate through each element of the distributions of language
       val initialSpots = List.empty[SpatialCodeSpot]
