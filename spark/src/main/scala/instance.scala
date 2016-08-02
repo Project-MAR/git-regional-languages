@@ -44,9 +44,9 @@ object TwoDimAnalysis {
     val ratioHistograms = Transform.toRatioBins(histograms)
 
     // Filter histograms where the output vector
-    // produces only up to 66% of the original vector
+    // produces only up to 80% of the original vector
     val reducedHistograms = Transform.toReducedBins(
-      ratioHistograms, 0.667
+      ratioHistograms, 0.80
     )
 
     // Illustrate histograms
@@ -60,14 +60,23 @@ object TwoDimAnalysis {
 
       // Plot the fractional-ratio histograms
       val toY = (in: LanguageHistogram) => Y(in.binVector, style = XYPlotStyle.Lines)
-      val x = (0 until ratioHistograms(0).size).map(_.toDouble)
-      val ys = ratioHistograms.map(toY).toSeq
+      val x = (0 until reducedHistograms(0).size).map(_.toDouble)
+      val ys = reducedHistograms.map(toY).toSeq
 
       output(GUI, xyChart(x -> ys))
+
+      // Also produce a PNG output as a physical file
+      val dir = new java.io.File(".").getCanonicalPath + "/plots/"
+      reducedHistograms.foreach {
+        case LanguageHistogram(lang, vecH) =>
+          val yh = toY(LanguageHistogram(lang, vecH))
+          output(PNG(dir, lang), xyChart(x -> Seq(yh), lang))
+
+          println(Console.GREEN + s"Saving ${lang}.gpl to ${dir}" + Console.RESET)
+      }
     }
 
     // TAOTODO: Analyse the spatial distributions
-    
-    
+
   }
 }
