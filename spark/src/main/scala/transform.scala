@@ -126,10 +126,10 @@ object Transform {
     val ns = sorted.tail
     val result_ = result.updated(i, n)
 
-    // If the built vector exceeds the max energy,
-    // returns the original version
+    // Finishes as soon as the energy of the output vector
+    // reaches the boundary (first time excession is acceptable.)
     if (sumE(result_) >= maxEnergy)
-      return result
+      return result_
     else
       // Otherwise, proceed 
       return aggregateEnergyBoundedVector(maxEnergy, ns, result_)
