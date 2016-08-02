@@ -40,8 +40,6 @@ object TwoDimAnalysis {
       20, 20
     )
 
-    // TAOTODO: Make these function compositions?
-
     // Normalise bin histograms
     val ratioHistograms = Transform.toRatioBins(histograms)
 
@@ -68,6 +66,8 @@ object TwoDimAnalysis {
       output(GUI, xyChart(x -> ys))
     }
 
-    // TAOTODO:
+    // TAOTODO: Analyse the spatial distributions
+    
+    
   }
 }
