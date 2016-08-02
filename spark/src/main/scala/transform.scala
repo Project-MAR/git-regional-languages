@@ -89,6 +89,48 @@ object Transform {
     }
   }
 
+  def toReducedBins(dataArray: Array[LanguageHistogram], decayRatio: Double): Array[LanguageHistogram] = {
+
+    val sumE = (array: Array[Double]) => {
+      val sumSqrEnergy = array.foldLeft(0D) { (tot, v) => tot + Math.pow(v, 2) }
+      Math.sqrt(sumSqrEnergy)
+    }
+
+    val buildVector = (maxEnergy: Double, sorted: Array[(Double, Int)], result: Array[Double]) => {
+      if (sorted.size == 0)
+        return result
+
+      val (n, i) = sorted.head
+      val ns = sorted.tail
+      val result_ = result.updated(i, n)
+
+      // If the built vector exceeds the max energy,
+      // returns the original version
+      if (sumE(result_) >= maxEnergy)
+        return result
+      else
+        // Otherwise, proceed 
+        return buildVector(maxEnergy, ns, result_)
+    }
+
+    dataArray.map {
+      case LanguageHistogram(lang, array) =>
+        val threshEnergy = decayRatio * sumE(array)
+        val array_ = array.zipWithIndex.sortWith {
+          case (a, b) =>
+            val (abin, aindex) = a
+            val (bbin, bindex) = b
+            abin > bbin
+        }
+        // Take larger elements first 
+        // until it builds a resultant array
+        // which composes energy up to desired fraction of original one.
+        val binLength = array.size
+        val reducedBinVec = buildVector(threshEnergy, array_, Array.fill(binLength)(0D))
+        LanguageHistogram(lang, reducedBinVec)
+    }
+  }
+
   /**
    * Aggregate the entire universal distributions
    * into one single dataframe

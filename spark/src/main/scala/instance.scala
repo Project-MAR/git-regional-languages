@@ -40,13 +40,21 @@ object TwoDimAnalysis {
       20, 20
     )
 
+    // TAOTODO: Make these function compositions?
+
     // Normalise bin histograms
     val ratioHistograms = Transform.toRatioBins(histograms)
+
+    // Filter histograms where the output vector
+    // produces only up to 66% of the original vector
+    val reducedHistograms = Transform.toReducedBins(
+      ratioHistograms, 0.667
+    )
 
     // Illustrate histograms
     if (verbose) {
       println(Console.CYAN + "***************** HISTOGRAMS ************" + Console.RESET)
-      ratioHistograms foreach { (hist) =>
+      reducedHistograms foreach { (hist) =>
         println(s"[${hist.lang}]")
         println(hist.binVector.mkString(","))
         println("-------------------------------")
