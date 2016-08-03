@@ -46,7 +46,7 @@ object TwoDimAnalysis {
     // Filter histograms where the output vector
     // produces only up to 80% of the original vector
     val reducedHistograms = Transform.toReducedBins(
-      ratioHistograms, 0.80
+      ratioHistograms, 0.92
     )
 
     // Illustrate histograms
@@ -63,20 +63,34 @@ object TwoDimAnalysis {
       val x = (0 until reducedHistograms(0).size).map(_.toDouble)
       val ys = reducedHistograms.map(toY).toSeq
 
-      output(GUI, xyChart(x -> ys))
+      output(GUI, xyChart(x -> ys, "All histograms"))
 
       // Also produce a PNG output as a physical file
+      val escapeLang = (lang: String) => lang.replace("/", ",")
       val dir = new java.io.File(".").getCanonicalPath + "/plots/"
       reducedHistograms.foreach {
         case LanguageHistogram(lang, vecH) =>
           val yh = toY(LanguageHistogram(lang, vecH))
-          output(PNG(dir, lang), xyChart(x -> Seq(yh), lang))
+          val lang_ = escapeLang(lang)
+          output(PNG(dir, lang_), xyChart(x -> Seq(yh), lang_))
 
           println(Console.GREEN + s"Saving ${lang}.gpl to ${dir}" + Console.RESET)
       }
     }
 
-    // TAOTODO: Analyse the spatial distributions
+    // Learn the histogram patterns
+    val (k, nIters) = (5, 10)
+    val clusters = Patterns.cluster(sc, reducedHistograms, 5, 10)
 
+    // Visualise each of the clusters
+    if (verbose) {
+      val x = (0 until reducedHistograms(0).size).map(_.toDouble)
+      val centroids = clusters
+        .clusterCenters
+        .map(n => Y(n.toArray))
+        .toSeq
+      println(Console.CYAN + "Visualising KMeans..." + Console.RESET)
+      output(GUI, xyChart(x -> centroids, "KMeans Centroids"))
+    }
   }
 }
