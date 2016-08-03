@@ -80,7 +80,7 @@ object TwoDimAnalysis {
 
     // Learn the histogram patterns
     val (k, nIters) = (5, 10)
-    val clusters = Patterns.cluster(sc, reducedHistograms, 5, 10)
+    val clusters = Patterns.createCluster(sc, reducedHistograms, 5, 10)
 
     // Visualise each of the clusters
     if (verbose) {
@@ -91,6 +91,18 @@ object TwoDimAnalysis {
         .toSeq
       println(Console.CYAN + "Visualising KMeans..." + Console.RESET)
       output(GUI, xyChart(x -> centroids, "KMeans Centroids"))
+    }
+
+    // Determine the cluster members
+    val clusterList = Patterns.cluster(sc, reducedHistograms, clusters)
+    val groups = clusterList.groupBy { case (cluster, hist) => cluster }
+    groups.foreach {
+      case (cluster, members) =>
+        println(Console.MAGENTA + s"======= CLUSTER [${cluster}] =======" + Console.RESET)
+        members.foreach {
+          case (_, LanguageHistogram(lang, v)) =>
+            println(lang)
+        }
     }
   }
 }
