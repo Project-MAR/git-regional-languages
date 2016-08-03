@@ -6,3 +6,5 @@ node_modules/
 spark/project/project/
 spark/project/target/
 spark/target
+spark/plots/
+target/
