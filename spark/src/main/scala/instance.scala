@@ -103,6 +103,9 @@ object TwoDimAnalysis {
           case (_, LanguageHistogram(lang, v)) =>
             println(lang)
         }
+
+        // TAOTODO: Copy the distribution images of languages
+        // in the same group into group directories
     }
   }
 }
