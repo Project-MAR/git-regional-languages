@@ -89,6 +89,10 @@ object Transform {
     }
   }
 
+  /**
+   * Compose new bin vectors from the source vectors
+   * where the results constitute up to {decayRatio} * original energy
+   */
   def toReducedBins(dataArray: Array[LanguageHistogram], decayRatio: Double): Array[LanguageHistogram] = {
 
     dataArray.map {
@@ -113,11 +117,17 @@ object Transform {
     }
   }
 
+  /**
+   * Calculate total RMS energy of a vector
+   */
   private def sumE(array: Array[Double]): Double = {
     val sumSqrEnergy = array.foldLeft(0D) { (tot, v) => tot + Math.pow(v, 2) }
     Math.sqrt(sumSqrEnergy)
   }
 
+  /**
+   * Helper function for creating a decayed vector
+   */
   private def aggregateEnergyBoundedVector(maxEnergy: Double, sorted: Array[(Double, Int)], result: Array[Double]): Array[Double] = {
     if (sorted.size == 0)
       return result

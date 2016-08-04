@@ -44,7 +44,7 @@ object TwoDimAnalysis {
     val ratioHistograms = Transform.toRatioBins(histograms)
 
     // Filter histograms where the output vector
-    // produces only up to 80% of the original vector
+    // produces only up to 92% of the original vector
     val reducedHistograms = Transform.toReducedBins(
       ratioHistograms, 0.92
     )
